@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }}{% endblock %}
+{% block header_title %}{{ course.icon }} {{ course.title }}{% endblock %}
+{% block header_subtitle %}{{ course.description[:90] }}…{% endblock %}
+
+{% block content %}
+
+<!-- Pass data to JavaScript -->
+<script>
+  var COURSE_ID       = "{{ course.id }}";
+  var COURSE_COLOR    = "{{ course.color }}";
+  var COMPLETED_IDS   = {{ progress.completed_videos | tojson }};
+  var TOTAL_VIDEOS    = {{ course.videos | length }};
+</script>
+
+<!-- Layout: left = video player, right = lesson list -->
+<div style="display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start;" id="detail-layout">
+
+  <!-- ===== LEFT: Video player ===== -->
+  <div>
+    <!-- Flowchart -->
+    <div id="flowchart-container" style="background:#1e293b;border:1px solid #1e3a5f;border-radius:16px;padding:24px 28px;margin-bottom:20px;">
+      <div style="font-size:13px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">Your Path</div>
+
+      <!-- SVG flowchart — updated by JS on video complete -->
+      <div id="flowchart-svg" style="overflow-x:auto;">
+        <svg id="flow-svg" width="{{ (course.videos|length - 1) * 60 + 32 }}" height="36"
+             viewBox="0 0 {{ (course.videos|length - 1) * 60 + 32 }} 36">
+          {% for v in course.videos %}
+          {% set cx = 16 + loop.index0 * 60 %}
+          {% set is_done = v.youtube_id in progress.completed_videos %}
+
+          {% if not loop.last %}
+          <line id="line-{{ loop.index0 }}"
+                x1="{{ cx + 14 }}" y1="18" x2="{{ cx + 46 }}" y2="18"
+                stroke="{{ course.color if is_done else '#334155' }}"
+                stroke-width="2"
+                {% if not is_done %}stroke-dasharray="4 2"{% endif %}/>
+          {% endif %}
+
+          <circle id="node-{{ loop.index0 }}"
+                  cx="{{ cx }}" cy="18" r="14"
+                  fill="{{ course.color if is_done else 'transparent' }}"
+                  stroke="{{ course.color if is_done or loop.index0 == progress.completed_videos|length else '#334155' }}"
+                  stroke-width="2"
+                  opacity="{{ '1' if is_done or loop.index0 == progress.completed_videos|length else '0.4' }}"/>
+
+          {% if is_done %}
+          <path id="check-{{ loop.index0 }}"
+                d="M{{ cx - 5 }} 18 l4 4 l7 -7"
+                stroke="#0f172a" stroke-width="2" fill="none"
+                stroke-linecap="round" stroke-linejoin="round"/>
+          {% else %}
+          <text id="label-{{ loop.index0 }}"
+                x="{{ cx }}" y="22" text-anchor="middle" font-size="11"
+                fill="{{ course.color if loop.index0 == progress.completed_videos|length else '#475569' }}"
+                font-weight="600">{{ loop.index }}</text>
+          {% endif %}
+          {% endfor %}
+        </svg>
+      </div>
+
+      <!-- Progress bar -->
+      <div style="margin-top:14px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:6px;">
+          <span id="progress-text">{{ progress.completed_videos|length }} / {{ course.videos|length }} completed</span>
+          <span id="progress-pct" style="color:{{ course.color }};">{{ progress.percent_complete | round | int }}%</span>
+        </div>
+        <div class="progress-bar">
+          <div id="progress-fill" class="progress-fill"
+               style="width:{{ progress.percent_complete | round | int }}%;background:{{ course.color }};"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video iframe -->
+    <div style="background:#1e293b;border:1px solid #1e3a5f;border-radius:16px;overflow:hidden;">
+      <div id="video-placeholder" style="aspect-ratio:16/9;background:#0f172a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#475569;padding:40px;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/>
+          <polygon points="10 8 16 12 10 16 10 8" fill="#475569"/>
+        </svg>
+        <span style="font-size:14px;">Click a lesson on the right to start watching</span>
+      </div>
+      <iframe id="video-frame" style="width:100%;aspect-ratio:16/9;border:none;display:none;"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+
+      <!-- Video title bar -->
+      <div id="video-info" style="padding:16px 20px;display:none;">
+        <div id="video-title" style="font-size:15px;font-weight:600;color:#f1f5f9;"></div>
+        <button id="mark-done-btn" onclick="markCurrentDone()"
+                style="margin-top:10px;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;
+                       background:{{ course.color }};color:#0f172a;transition:opacity 0.2s;">
+          ✓ Mark as Complete
+        </button>
+      </div>
+    </div>
+
+    <!-- Completed banner -->
+    <div id="completed-banner" style="display:{% if progress.completed %}flex{% else %}none{% endif %};
+         background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:12px;
+         padding:20px 24px;margin-top:20px;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#4ade80;">🏆 Course Complete!</div>
+        <div style="font-size:13px;color:#64748b;margin-top:3px;">You've finished all lessons. Download your certificate below.</div>
+      </div>
+      <a href="{{ url_for('download_certificate', course_id=course.id) }}"
+         style="padding:10px 20px;background:#4ade80;color:#0f172a;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;">
+        ⬇ Get Certificate
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== RIGHT: Lesson list ===== -->
+  <div style="background:#1e293b;border:1px solid #1e3a5f;border-radius:16px;overflow:hidden;position:sticky;top:20px;">
+    <div style="padding:18px 20px;border-bottom:1px solid #1e3a5f;">
+      <div style="font-size:14px;font-weight:600;color:#f1f5f9;">Lessons</div>
+      <div style="font-size:12px;color:#64748b;margin-top:2px;">{{ course.videos|length }} videos</div>
+    </div>
+
+    <div style="padding:10px;">
+      {% for v in course.videos %}
+      {% set is_done = v.youtube_id in progress.completed_videos %}
+      <div id="lesson-{{ loop.index0 }}"
+           onclick="playVideo('{{ v.youtube_id }}', '{{ v.title | replace("'","") }}', {{ loop.index0 }})"
+           style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;cursor:pointer;transition:background 0.15s;margin-bottom:4px;
+                  border:1px solid {% if is_done %}{{ course.color }}33{% else %}transparent{% endif %};
+                  background:{% if is_done %}{{ course.color }}0a{% else %}transparent{% endif %};"
+           onmouseover="if(!this.classList.contains('playing'))this.style.background='rgba(15,23,42,0.5)'"
+           onmouseout="if(!this.classList.contains('playing'))this.style.background='{% if is_done %}{{ course.color }}0a{% else %}transparent{% endif %}'">
+
+        <!-- Status circle -->
+        <div id="status-{{ loop.index0 }}"
+             style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+                    {% if is_done %}background:{{ course.color }};color:#0f172a;{% else %}background:#0f172a;border:1.5px solid #334155;color:#64748b;{% endif %}">
+          {% if is_done %}✓{% else %}{{ loop.index }}{% endif %}
+        </div>
+
+        <div style="flex:1;min-width:0;">
+          <div id="lesson-title-{{ loop.index0 }}"
+               style="font-size:13px;font-weight:500;color:{% if is_done %}#94a3b8{% else %}#f1f5f9{% endif %};
+                      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            {{ v.title }}
+          </div>
+          <div style="font-size:11px;color:#475569;margin-top:2px;">
+            {% if is_done %}Completed{% else %}Lesson {{ loop.index }}{% endif %}
+          </div>
+        </div>
+
+        <!-- Play icon -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="{{ course.color if is_done else '#475569' }}">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Store video data from the server
+  var videos = [
+    {% for v in course.videos %}
+    { youtube_id: "{{ v.youtube_id }}", title: "{{ v.title | replace('"', '\\"') }}" }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  var currentVideoIndex = -1;
+  var currentYouTubeId  = null;
+
+  // Play a video when user clicks a lesson
+  function playVideo(youtubeId, title, index) {
+    var frame       = document.getElementById("video-frame");
+    var placeholder = document.getElementById("video-placeholder");
+    var infoBar     = document.getElementById("video-info");
+    var titleEl     = document.getElementById("video-title");
+    var doneBtn     = document.getElementById("mark-done-btn");
+
+    // Update iframe
+    frame.src = "https://www.youtube.com/embed/" + youtubeId + "?autoplay=1";
+    frame.style.display = "block";
+    placeholder.style.display = "none";
+    infoBar.style.display = "block";
+    titleEl.textContent = title;
+
+    currentVideoIndex = index;
+    currentYouTubeId  = youtubeId;
+
+    // Highlight active lesson
+    document.querySelectorAll("[id^='lesson-']").forEach(function(el) {
+      el.classList.remove("playing");
+      el.style.outline = "none";
+    });
+    var lessonEl = document.getElementById("lesson-" + index);
+    lessonEl.classList.add("playing");
+    lessonEl.style.outline = "2px solid " + COURSE_COLOR;
+
+    // If already done, hide the mark-done button
+    if (COMPLETED_IDS.includes(youtubeId)) {
+      doneBtn.textContent  = "✓ Already Completed";
+      doneBtn.disabled     = true;
+      doneBtn.style.opacity = "0.5";
+    } else {
+      doneBtn.textContent  = "✓ Mark as Complete";
+      doneBtn.disabled     = false;
+      doneBtn.style.opacity = "1";
+    }
+  }
+
+  // Mark the current video as complete (AJAX call to Flask)
+  function markCurrentDone() {
+    if (!currentYouTubeId) return;
+    if (COMPLETED_IDS.includes(currentYouTubeId)) return;
+
+    fetch("/api/complete-video", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ course_id: COURSE_ID, youtube_id: currentYouTubeId })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      // Update our local list
+      COMPLETED_IDS = data.completed_videos;
+      var completedCount = COMPLETED_IDS.length;
+
+      // Update the lesson row UI
+      var statusEl = document.getElementById("status-" + currentVideoIndex);
+      if (statusEl) {
+        statusEl.textContent       = "✓";
+        statusEl.style.background  = COURSE_COLOR;
+        statusEl.style.color       = "#0f172a";
+        statusEl.style.border      = "none";
+      }
+      var lessonEl = document.getElementById("lesson-" + currentVideoIndex);
+      if (lessonEl) {
+        lessonEl.style.background   = COURSE_COLOR + "0a";
+        lessonEl.style.borderColor  = COURSE_COLOR + "33";
+      }
+      var lessonTitleEl = document.getElementById("lesson-title-" + currentVideoIndex);
+      if (lessonTitleEl) lessonTitleEl.style.color = "#94a3b8";
+
+      // Update progress bar and text
+      var pct = Math.round(data.percent);
+      document.getElementById("progress-fill").style.width = pct + "%";
+      document.getElementById("progress-pct").textContent  = pct + "%";
+      document.getElementById("progress-text").textContent = completedCount + " / " + TOTAL_VIDEOS + " completed";
+
+      // Update flowchart nodes
+      updateFlowchart(completedCount);
+
+      // Disable the mark-done button
+      var doneBtn = document.getElementById("mark-done-btn");
+      doneBtn.textContent  = "✓ Already Completed";
+      doneBtn.disabled     = true;
+      doneBtn.style.opacity = "0.5";
+
+      // Show completed banner if course is done
+      if (data.completed) {
+        document.getElementById("completed-banner").style.display = "flex";
+      }
+    })
+    .catch(function(err) { console.error("Error:", err); });
+  }
+
+  // Update SVG flowchart nodes based on how many are done
+  function updateFlowchart(completedCount) {
+    for (var i = 0; i < TOTAL_VIDEOS; i++) {
+      var node  = document.getElementById("node-"  + i);
+      var label = document.getElementById("label-" + i);
+      var check = document.getElementById("check-" + i);
+      var line  = document.getElementById("line-"  + i);
+
+      if (!node) continue;
+
+      if (i < completedCount) {
+        // Completed
+        node.setAttribute("fill",    COURSE_COLOR);
+        node.setAttribute("stroke",  COURSE_COLOR);
+        node.setAttribute("opacity", "1");
+        if (label) label.setAttribute("fill", "#0f172a");
+      } else if (i === completedCount) {
+        // Current
+        node.setAttribute("fill",    "transparent");
+        node.setAttribute("stroke",  COURSE_COLOR);
+        node.setAttribute("opacity", "1");
+        if (label) label.setAttribute("fill", COURSE_COLOR);
+      } else {
+        // Future
+        node.setAttribute("fill",    "transparent");
+        node.setAttribute("stroke",  "#334155");
+        node.setAttribute("opacity", "0.4");
+        if (label) label.setAttribute("fill", "#475569");
+      }
+
+      if (line) {
+        if (i < completedCount) {
+          line.setAttribute("stroke",          COURSE_COLOR);
+          line.removeAttribute("stroke-dasharray");
+        } else {
+          line.setAttribute("stroke",          "#334155");
+          line.setAttribute("stroke-dasharray","4 2");
+        }
+      }
+    }
+  }
+</script>
+{% endblock %}

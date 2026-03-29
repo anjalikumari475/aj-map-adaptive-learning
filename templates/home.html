@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+{% block header_title %}Welcome back, {{ session.user_name }}! 👋{% endblock %}
+{% block header_subtitle %}Continue your adaptive learning journey{% endblock %}
+
+{% block content %}
+
+<!-- Stats row -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px;">
+
+  {% set completed_count = namespace(val=0) %}
+  {% for cid, course in courses.items() %}
+    {% if progress.get(cid, {}).get('completed') %}
+      {% set completed_count.val = completed_count.val + 1 %}
+    {% endif %}
+  {% endfor %}
+
+  <div style="background:#1e293b;border:1px solid #1e3a5f;border-radius:12px;padding:20px;">
+    <div style="font-size:28px;font-weight:700;color:#06b6d4;">{{ courses|length }}</div>
+    <div style="font-size:13px;color:#64748b;margin-top:4px;">Total Courses</div>
+  </div>
+
+  <div style="background:#1e293b;border:1px solid #1e3a5f;border-radius:12px;padding:20px;">
+    <div style="font-size:28px;font-weight:700;color:#22c55e;">{{ completed_count.val }}</div>
+    <div style="font-size:13px;color:#64748b;margin-top:4px;">Completed</div>
+  </div>
+
+  <div style="background:#1e293b;border:1px solid #1e3a5f;border-radius:12px;padding:20px;">
+    {% set total_videos_watched = namespace(val=0) %}
+    {% for cid in courses %}
+      {% set total_videos_watched.val = total_videos_watched.val + progress.get(cid, {}).get('completed_videos', [])|length %}
+    {% endfor %}
+    <div style="font-size:28px;font-weight:700;color:#f97316;">{{ total_videos_watched.val }}</div>
+    <div style="font-size:13px;color:#64748b;margin-top:4px;">Videos Watched</div>
+  </div>
+
+</div>
+
+<!-- Course cards -->
+<h2 style="font-size:16px;font-weight:600;color:#94a3b8;margin:0 0 16px;text-transform:uppercase;letter-spacing:0.05em;">Your Courses</h2>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
+  {% for cid, course in courses.items() %}
+  {% set prog = progress.get(cid, {'completed_videos':[],'percent_complete':0,'completed':False}) %}
+  {% set pct  = prog.percent_complete | round | int %}
+  {% set done = prog.completed %}
+
+  <div style="background:#1e293b;border:1px solid #1e3a5f;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px;transition:border-color 0.2s;"
+       onmouseover="this.style.borderColor='{{ course.color }}44'" onmouseout="this.style.borderColor='#1e3a5f'">
+
+    <!-- Course header -->
+    <div style="display:flex;align-items:flex-start;gap:14px;">
+      <div style="width:46px;height:46px;border-radius:12px;background:{{ course.color }}22;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">
+        {{ course.icon }}
+      </div>
+      <div>
+        <div style="font-size:16px;font-weight:600;color:#f1f5f9;">{{ course.title }}</div>
+        <div style="font-size:13px;color:#64748b;margin-top:3px;line-height:1.4;">{{ course.description[:80] }}…</div>
+      </div>
+    </div>
+
+    <!-- Flowchart (SVG) -->
+    <div>
+      <svg width="{{ (course.videos|length - 1) * 52 + 28 }}" height="28" viewBox="0 0 {{ (course.videos|length - 1) * 52 + 28 }} 28">
+        {% set completed_ids = prog.completed_videos %}
+        {% for v in course.videos %}
+          {% set cx = 14 + loop.index0 * 52 %}
+          {% set is_done = v.youtube_id in completed_ids %}
+          {% set prev_done = loop.index0 < completed_ids|length %}
+
+          {% if not loop.last %}
+          <line x1="{{ cx + 14 }}" y1="14" x2="{{ cx + 38 }}" y2="14"
+                stroke="{{ course.color if is_done else '#334155' }}"
+                stroke-width="2"
+                {% if not is_done %}stroke-dasharray="4 2"{% endif %}/>
+          {% endif %}
+
+          <circle cx="{{ cx }}" cy="14" r="12"
+                  fill="{{ course.color if is_done else 'transparent' }}"
+                  stroke="{{ course.color if is_done or loop.index0 == completed_ids|length else '#334155' }}"
+                  stroke-width="2"
+                  opacity="{{ '1' if is_done or loop.index0 == completed_ids|length else '0.4' }}"/>
+
+          {% if is_done %}
+          <path d="M{{ cx - 5 }} 14 l4 4 l7 -7"
+                stroke="#0f172a" stroke-width="2" fill="none"
+                stroke-linecap="round" stroke-linejoin="round"/>
+          {% else %}
+          <text x="{{ cx }}" y="18" text-anchor="middle" font-size="10"
+                fill="{{ course.color if loop.index0 == completed_ids|length else '#475569' }}"
+                font-weight="600">{{ loop.index }}</text>
+          {% endif %}
+        {% endfor %}
+      </svg>
+    </div>
+
+    <!-- Progress bar -->
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:6px;">
+        <span>{{ prog.completed_videos|length }} / {{ course.videos|length }} videos</span>
+        <span style="color:{{ course.color }};">{{ pct }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:{{ pct }}%;background:{{ course.color }};"></div>
+      </div>
+    </div>
+
+    <!-- Action button -->
+    <a href="{{ url_for('course_detail', course_id=cid) }}"
+       style="display:block;text-align:center;padding:10px 0;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;
+              background:{{ course.color }}22;color:{{ course.color }};border:1px solid {{ course.color }}44;transition:background 0.2s;"
+       onmouseover="this.style.background='{{ course.color }}33'" onmouseout="this.style.background='{{ course.color }}22'">
+      {% if done %}🏆 View Course{% elif prog.completed_videos|length > 0 %}▶ Continue{% else %}▶ Start Course{% endif %}
+    </a>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

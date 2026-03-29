@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Account{% endblock %}
+{% block header_title %}My Account{% endblock %}
+{% block header_subtitle %}Your profile and learning stats{% endblock %}
+
+{% block content %}
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:800px;">
+
+  <!-- Profile card -->
+  <div style="background:#1e293b;border:1px solid #1e3a5f;border-radius:16px;padding:28px;grid-column:1/-1;">
+    <div style="display:flex;align-items:center;gap:20px;">
+      <!-- Avatar -->
+      <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#06b6d4,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;flex-shrink:0;">
+        {{ user.name[0]|upper }}
+      </div>
+      <div>
+        <div style="font-size:22px;font-weight:700;color:#f1f5f9;">{{ user.name }}</div>
+        <div style="font-size:14px;color:#64748b;margin-top:4px;">{{ user.email }}</div>
+        <div style="font-size:12px;color:#475569;margin-top:4px;">
+          Joined: {{ user.created_at.strftime('%B %d, %Y') }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div style="background:#1e293b;border:1px solid #1e3a5f;border-radius:16px;padding:24px;text-align:center;">
+    <div style="font-size:40px;font-weight:700;color:#06b6d4;">{{ completed_count }}</div>
+    <div style="font-size:14px;color:#64748b;margin-top:6px;">Courses Completed</div>
+  </div>
+
+  <div style="background:#1e293b;border:1px solid #1e3a5f;border-radius:16px;padding:24px;text-align:center;">
+    <div style="font-size:40px;font-weight:700;color:#8b5cf6;">{{ completed_count }}</div>
+    <div style="font-size:14px;color:#64748b;margin-top:6px;">Certificates Earned</div>
+  </div>
+
+  <!-- Tech stack info (nice for the college project) -->
+  <div style="background:#1e293b;border:1px solid #1e3a5f;border-radius:16px;padding:24px;grid-column:1/-1;">
+    <h3 style="font-size:14px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 16px;">Tech Stack</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;">
+      <span style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 14px;font-size:13px;color:#f1f5f9;">
+        🐍 Python + Flask
+      </span>
+      <span style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 14px;font-size:13px;color:#f1f5f9;">
+        🐘 Neon PostgreSQL
+      </span>
+      <span style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 14px;font-size:13px;color:#f1f5f9;">
+        🎨 Tailwind CSS
+      </span>
+      <span style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 14px;font-size:13px;color:#f1f5f9;">
+        ☁ Hosted on Render
+      </span>
+      <span style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 14px;font-size:13px;color:#f1f5f9;">
+        📄 PDF Certificates (fpdf2)
+      </span>
+    </div>
+  </div>
+
+  <!-- Logout button -->
+  <div style="grid-column:1/-1;">
+    <a href="{{ url_for('logout') }}"
+       style="display:inline-block;padding:11px 24px;border-radius:9px;font-size:14px;font-weight:600;text-decoration:none;
+              background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.3);">
+      Sign Out
+    </a>
+  </div>
+</div>
+
+{% endblock %}

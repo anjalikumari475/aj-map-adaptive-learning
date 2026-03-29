@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Certifications{% endblock %}
+{% block header_title %}Certifications{% endblock %}
+{% block header_subtitle %}Download your earned certificates{% endblock %}
+
+{% block content %}
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;">
+  {% for cid, course in courses.items() %}
+  {% set is_completed = progress.get(cid, {}).get('completed', False) %}
+  {% set cert = certs.get(cid) %}
+
+  <div style="background:#1e293b;border:1px solid {% if is_completed %}{{ course.color }}44{% else %}#1e3a5f{% endif %};border-radius:16px;overflow:hidden;">
+
+    <!-- Top strip -->
+    <div style="height:4px;background:{% if is_completed %}{{ course.color }}{% else %}#334155{% endif %};"></div>
+
+    <div style="padding:28px;">
+      <!-- Icon + title -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+        <div style="width:52px;height:52px;border-radius:14px;background:{% if is_completed %}{{ course.color }}22{% else %}#0f172a{% endif %};display:flex;align-items:center;justify-content:center;font-size:26px;">
+          {{ course.icon }}
+        </div>
+        <div>
+          <div style="font-size:16px;font-weight:600;color:#f1f5f9;">{{ course.title }}</div>
+          <div style="font-size:13px;color:#64748b;">{{ course.videos|length }} lessons</div>
+        </div>
+      </div>
+
+      {% if is_completed %}
+        <!-- Completed state -->
+        <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:16px;text-align:center;margin-bottom:16px;">
+          <div style="font-size:28px;margin-bottom:8px;">🏆</div>
+          <div style="font-weight:600;color:#4ade80;font-size:15px;">Course Completed!</div>
+          {% if cert %}
+          <div style="font-size:12px;color:#64748b;margin-top:4px;">
+            Issued: {{ cert.issued_at.strftime('%b %d, %Y') }}
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Certificate preview card -->
+        <div style="border:1px solid {{ course.color }}33;border-radius:10px;padding:16px;margin-bottom:16px;background:rgba(15,23,42,0.5);">
+          <div style="font-size:11px;color:#475569;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Certificate Preview</div>
+          <div style="font-size:14px;font-weight:600;color:#f1f5f9;">AJ Map — {{ course.title }}</div>
+          <div style="font-size:12px;color:#64748b;margin-top:3px;">Awarded to: {{ session.user_name }}</div>
+        </div>
+
+        <!-- Download button -->
+        <a href="{{ url_for('download_certificate', course_id=cid) }}"
+           style="display:block;text-align:center;padding:12px 0;border-radius:9px;font-size:14px;font-weight:600;text-decoration:none;
+                  background:{{ course.color }};color:#0f172a;transition:opacity 0.2s;"
+           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          ⬇ Download PDF Certificate
+        </a>
+
+      {% else %}
+        <!-- Not completed state -->
+        <div style="background:rgba(15,23,42,0.5);border:1px solid #1e3a5f;border-radius:10px;padding:20px;text-align:center;margin-bottom:16px;">
+          <div style="font-size:32px;margin-bottom:10px;opacity:0.3;">🏆</div>
+          <div style="font-size:14px;color:#64748b;">Complete this course to earn your certificate</div>
+        </div>
+
+        {% set prog = progress.get(cid, {'completed_videos':[],'percent_complete':0}) %}
+        {% set pct = prog.percent_complete | round | int %}
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:6px;">
+            <span>Progress</span>
+            <span>{{ pct }}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:{{ pct }}%;background:{{ course.color }};"></div>
+          </div>
+        </div>
+
+        <a href="{{ url_for('course_detail', course_id=cid) }}"
+           style="display:block;text-align:center;padding:12px 0;border-radius:9px;font-size:14px;font-weight:600;text-decoration:none;
+                  background:{{ course.color }}22;color:{{ course.color }};border:1px solid {{ course.color }}44;">
+          Continue Learning →
+        </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

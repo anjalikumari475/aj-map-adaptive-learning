@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — AJ Map</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family:'Inter',sans-serif; background:#0f172a; color:#f1f5f9; margin:0; }
+    input {
+      width:100%;
+      background:#1e293b;
+      border:1px solid #334155;
+      border-radius:8px;
+      padding:10px 14px;
+      font-size:14px;
+      color:#f1f5f9;
+      outline:none;
+      transition:border-color 0.2s;
+    }
+    input:focus { border-color:#06b6d4; }
+    input::placeholder { color:#475569; }
+  </style>
+</head>
+<body>
+
+<!-- Animated background dots -->
+<div style="position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;">
+  <div style="position:absolute;top:15%;left:10%;width:300px;height:300px;background:rgba(6,182,212,0.05);border-radius:50%;filter:blur(60px);"></div>
+  <div style="position:absolute;bottom:20%;right:15%;width:250px;height:250px;background:rgba(139,92,246,0.05);border-radius:50%;filter:blur(60px);"></div>
+</div>
+
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;z-index:1;">
+  <div style="width:100%;max-width:420px;">
+
+    <!-- Logo + heading -->
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="display:inline-flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <svg width="44" height="44" viewBox="0 0 32 32" fill="none">
+          <rect width="32" height="32" rx="8" fill="#06b6d4" fill-opacity="0.15"/>
+          <circle cx="8"  cy="16" r="3" fill="#06b6d4"/>
+          <circle cx="16" cy="8"  r="3" fill="#8b5cf6"/>
+          <circle cx="24" cy="16" r="3" fill="#f97316"/>
+          <circle cx="16" cy="24" r="3" fill="#06b6d4"/>
+          <line x1="8"  y1="16" x2="16" y2="8"  stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="2 1"/>
+          <line x1="16" y1="8"  x2="24" y2="16" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="2 1"/>
+          <line x1="24" y1="16" x2="16" y2="24" stroke="#f97316" stroke-width="1.5" stroke-dasharray="2 1"/>
+          <line x1="8"  y1="16" x2="16" y2="24" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="2 1"/>
+        </svg>
+        <div style="text-align:left;">
+          <div style="font-size:22px;font-weight:700;color:#f1f5f9;">AJ Map</div>
+          <div style="font-size:12px;color:#64748b;">Adaptive Learning Platform</div>
+        </div>
+      </div>
+      <h2 style="font-size:24px;font-weight:700;color:#f1f5f9;margin:0 0 6px;">Welcome back</h2>
+      <p style="color:#64748b;font-size:14px;margin:0;">Enter your details to continue learning</p>
+    </div>
+
+    <!-- Card -->
+    <div style="background:#1e293b;border:1px solid #1e3a5f;border-radius:16px;padding:32px;">
+
+      {% if error %}
+      <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px 16px;margin-bottom:20px;color:#fca5a5;font-size:14px;">
+        ⚠ {{ error }}
+      </div>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('login') }}">
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:13px;font-weight:500;color:#94a3b8;margin-bottom:6px;">Full Name</label>
+          <input type="text" name="name" placeholder="e.g. Arjun Sharma" />
+        </div>
+
+        <div style="margin-bottom:24px;">
+          <label style="display:block;font-size:13px;font-weight:500;color:#94a3b8;margin-bottom:6px;">Email Address <span style="color:#ef4444;">*</span></label>
+          <input type="email" name="email" placeholder="you@example.com" required />
+        </div>
+
+        <button type="submit"
+          style="width:100%;background:#06b6d4;color:#0f172a;font-weight:700;font-size:15px;padding:12px;border-radius:8px;border:none;cursor:pointer;transition:opacity 0.2s;"
+          onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          Get Started →
+        </button>
+      </form>
+
+      <p style="text-align:center;font-size:12px;color:#475569;margin-top:20px;">
+        New user? Just enter your name and email — your account is created automatically.
+      </p>
+    </div>
+
+    <!-- Tech stack badges -->
+    <div style="display:flex;justify-content:center;gap:8px;margin-top:24px;flex-wrap:wrap;">
+      <span style="background:#1e293b;border:1px solid #334155;border-radius:6px;padding:4px 10px;font-size:11px;color:#64748b;">Python + Flask</span>
+      <span style="background:#1e293b;border:1px solid #334155;border-radius:6px;padding:4px 10px;font-size:11px;color:#64748b;">Neon PostgreSQL</span>
+      <span style="background:#1e293b;border:1px solid #334155;border-radius:6px;padding:4px 10px;font-size:11px;color:#64748b;">Tailwind CSS</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
