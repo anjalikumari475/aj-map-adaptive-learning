@@ -185,9 +185,9 @@ COURSES = {
         "videos": [
             {"id": "v1", "title": "HTML & CSS Fundamentals",         "youtube_id": "ysEN5RaKOlA"}, 
             {"id": "v2", "title": "JavaScript Essentials",           "youtube_id": "o1IaduQICO0"}, 
-            {"id": "v3", "title": "React.js for Beginners",          "youtube_id": "8t-mQE7QSt4"}, 
+            {"id": "v3", "title": "React.js for Beginners",          "youtube_id": "TFBnZcT0A5eFefmo"}, 
             {"id": "v4", "title": "Node.js & Express Backend",       "youtube_id": "JnvKXcSI7yk"}, 
-            {"id": "v5", "title": "Full Stack Project Walkthrough",   "youtube_id": "9vkCsk7Nd0s"}, 
+            {"id": "v5", "title": "Full Stack Project Walkthrough",   "youtube_id": "Zt8vzBEHjNXlbm6l"}, 
         ]
     },
     "cyber-security": {
@@ -198,7 +198,7 @@ COURSES = {
         "icon": "🔒",
         "videos": [
             {"id": "v1", "title": "Introduction to Cyber Security",  "youtube_id": "nzZkKoREEGo"}, 
-            {"id": "v2", "title": "Network Security Fundamentals",   "youtube_id": "hXSFdwxNqMs"}, 
+            {"id": "v2", "title": "Network Security Fundamentals",   "youtube_id": "wZiYc6a52UpXBYeu"}, 
             {"id": "v3", "title": "Ethical Hacking Basics",          "youtube_id": "dz7Ntp7KQGA"},  
             {"id": "v4", "title": "Cryptography & Encryption",       "youtube_id": "AQDCe585Lnc"},  
             {"id": "v5", "title": "Security Best Practices",         "youtube_id": "rcDO8km6R6c"}, 
