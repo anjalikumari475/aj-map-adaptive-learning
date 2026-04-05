@@ -169,11 +169,11 @@ COURSES = {
         "color": "#06b6d4",
         "icon": "📊",
         "videos": [
-            {"id": "v1", "title": "Introduction to Data Analysis", "youtube_id": "Liv2MfdJIvg"},
-            {"id": "v2", "title": "Python for Data Analysis",      "youtube_id": "iuBaJtW5gA8"},
-            {"id": "v3", "title": "Data Visualization Basics",     "youtube_id": "QYcnkHWHFbE"},
-            {"id": "v4", "title": "SQL for Data Analysts",         "youtube_id": "1VCWpRwZ4dM"},
-            {"id": "v5", "title": "Machine Learning Basics",       "youtube_id": "bDTE7aJZSaM"},
+            {"id": "v1", "title": "Introduction to Data Analysis",   "youtube_id": "ua-CiDNNj30"},
+            {"id": "v2", "title": "Python for Data Analysis",        "youtube_id": "WFr2WgN9_xE"}, 
+            {"id": "v3", "title": "Data Visualization Basics",       "youtube_id": "6GUZXDef2U0"}, 
+            {"id": "v4", "title": "SQL for Data Analysts",           "youtube_id": "BPHAr4QGGVE"},  
+            {"id": "v5", "title": "Machine Learning Basics",         "youtube_id": "GwIo3gDZCVQ"},  
         ]
     },
     "web-developer": {
@@ -183,11 +183,11 @@ COURSES = {
         "color": "#8b5cf6",
         "icon": "💻",
         "videos": [
-            {"id": "v1", "title": "HTML & CSS Fundamentals",        "youtube_id": "ysEN5RaKOlA"},
-            {"id": "v2", "title": "JavaScript Essentials",          "youtube_id": "UB1O30fR-EE"},
-            {"id": "v3", "title": "React.js for Beginners",         "youtube_id": "h0e2HAPTGF0"},
-            {"id": "v4", "title": "Node.js & Express Backend",      "youtube_id": "G3e-cpL7ofc"},
-            {"id": "v5", "title": "Full Stack Project Walkthrough",  "youtube_id": "SBmUHDkbHUA"},
+            {"id": "v1", "title": "HTML & CSS Fundamentals",         "youtube_id": "ysEN5RaKOlA"}, 
+            {"id": "v2", "title": "JavaScript Essentials",           "youtube_id": "o1IaduQICO0"}, 
+            {"id": "v3", "title": "React.js for Beginners",          "youtube_id": "8t-mQE7QSt4"}, 
+            {"id": "v4", "title": "Node.js & Express Backend",       "youtube_id": "JnvKXcSI7yk"}, 
+            {"id": "v5", "title": "Full Stack Project Walkthrough",   "youtube_id": "9vkCsk7Nd0s"}, 
         ]
     },
     "cyber-security": {
@@ -197,11 +197,11 @@ COURSES = {
         "color": "#f97316",
         "icon": "🔒",
         "videos": [
-            {"id": "v1", "title": "Introduction to Cyber Security",  "youtube_id": "inWWhr5tnEA"},
-            {"id": "v2", "title": "Network Security Fundamentals",   "youtube_id": "hXSFdwxNqMs"},
-            {"id": "v3", "title": "Ethical Hacking Basics",          "youtube_id": "U_P23SqJaDc"},
-            {"id": "v4", "title": "Cryptography & Encryption",       "youtube_id": "nzZkKoREEGo"},
-            {"id": "v5", "title": "Security Best Practices",         "youtube_id": "26ABzvAuyS8"},
+            {"id": "v1", "title": "Introduction to Cyber Security",  "youtube_id": "nzZkKoREEGo"}, 
+            {"id": "v2", "title": "Network Security Fundamentals",   "youtube_id": "hXSFdwxNqMs"}, 
+            {"id": "v3", "title": "Ethical Hacking Basics",          "youtube_id": "dz7Ntp7KQGA"},  
+            {"id": "v4", "title": "Cryptography & Encryption",       "youtube_id": "AQDCe585Lnc"},  
+            {"id": "v5", "title": "Security Best Practices",         "youtube_id": "rcDO8km6R6c"}, 
         ]
     }
 }
