@@ -185,9 +185,9 @@ COURSES = {
         "videos": [
             {"id": "v1", "title": "HTML & CSS Fundamentals",         "youtube_id": "ysEN5RaKOlA"}, 
             {"id": "v2", "title": "JavaScript Essentials",           "youtube_id": "o1IaduQICO0"}, 
-            {"id": "v3", "title": "React.js for Beginners",          "youtube_id": "h_k_Repde4CVtyao"}, 
+            {"id": "v3", "title": "React.js for Beginners",          "youtube_id": "HsKyxts95dfD-b0d"}, 
             {"id": "v4", "title": "Node.js & Express Backend",       "youtube_id": "JnvKXcSI7yk"}, 
-            {"id": "v5", "title": "Full Stack Project Walkthrough",   "youtube_id": "Pn3RlmXxssON-XCO"}, 
+            {"id": "v5", "title": "Full Stack Project Walkthrough",   "youtube_id": "jko1Xl1l1LDymKWE"}, 
         ]
     },
     "cyber-security": {
